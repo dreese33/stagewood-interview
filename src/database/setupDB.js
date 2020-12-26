@@ -23,8 +23,6 @@ const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
-await client.connect();
-
 
 //Query declarations
 let accountTableExists = false;
@@ -63,7 +61,7 @@ function addAccount() {
 }
 
 
-function dropAccounts() {
+function clearDatabase() {
     client.query(deleteAccountsTable, (err, res) => {
         if (err) {
             console.error(err);
@@ -77,12 +75,10 @@ function dropAccounts() {
 function recreateAccountTable() {
     read.question(deleteDBStr + '\n' + warning, response => {
         if (response === "drop-database") {
-            console.log("\nDropping accounts");
-            dropAccounts();
+            console.log("\nClearing database");
+            clearDatabase();
             createAccountTable();
             addAccount();
-        } else {
-            client.end();
         }
         read.close();
     });
@@ -99,14 +95,25 @@ function testAccountTableExists() {
     }
 }
 
-client.query(accountTableStatusQuery, (err, res) => {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    if (res.rowCount > 0) {
-        accountTableExists = true;
-    }
-    createPgcryptoExtension();
-    testAccountTableExists();
-});
+
+async function callQueries() {
+    await createPgcryptoExtension();
+    await testAccountTableExists();
+}
+
+
+const main = async () => {
+    await client.connect();
+    client.query(accountTableStatusQuery, (err, res) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        if (res.rowCount > 0) {
+            accountTableExists = true;
+        }
+        callQueries();
+    });
+};
+
+main();
