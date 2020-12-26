@@ -1,0 +1,12 @@
+{
+  "name": "stagewood-interview",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/dreese33/stagewood-interview",
+  "author": "dreese33 <dylanjacobreese@gatech.edu>",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "apollo-server": "^2.19.1"
+  }
+}
