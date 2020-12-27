@@ -29,7 +29,7 @@ const client = new Client({
 let accountTableExists = false;
 
 
-function createPgcryptoExtension() {
+async function createPgcryptoExtension() {
     client.query(pgcryptoExtension, (err, res) => {
         if (err) {
             console.error(err);
@@ -39,7 +39,7 @@ function createPgcryptoExtension() {
 }
 
 
-function createAccountTable() {
+async function createAccountTable() {
     client.query(createAccountTableQuery, (err, res) => {
         if (err) {
             console.error(err);
@@ -50,7 +50,7 @@ function createAccountTable() {
 }
 
 
-function addAccount() {
+async function addAccount() {
     client.query(addAccountQuery, (err, res) => {
         if (err) {
             console.error(err);
@@ -62,7 +62,7 @@ function addAccount() {
 }
 
 
-function clearDatabase() {
+async function clearDatabase() {
     client.query(deleteAccountsTable, (err, res) => {
         if (err) {
             console.error(err);
@@ -74,7 +74,7 @@ function clearDatabase() {
 
 
 /* Actions begin */
-function createAuthenticationFunction() {
+async function createAuthenticationFunction() {
     client.query(createAuthFunction, (err, res) => {
         if (err) {
             console.error(err);
@@ -84,7 +84,7 @@ function createAuthenticationFunction() {
 }
 
 
-function dropAuth() {
+async function dropAuth() {
     client.query("DROP FUNCTION action_authenticate;", (err, res) => {
         if (err) {
             console.error(err);
@@ -95,7 +95,7 @@ function dropAuth() {
 }
 
 
-function dropActionTable() {
+async function dropActionTable() {
     client.query("DROP TABLE action;", (err, res) => {
         if (err) {
             console.error(err);
@@ -106,7 +106,7 @@ function dropActionTable() {
 }
 
 
-function createActionsTable() {
+async function createActionsTable() {
     client.query(createActionTable, (err, res) => {
         if (err) {
             console.error(err);
@@ -117,7 +117,7 @@ function createActionsTable() {
 }
 
 
-function createDispatcherTrigger() {
+async function createDispatcherTrigger() {
     client.query(createDispatcher, (err, res) => {
         if (err) {
             console.error(err);
@@ -128,7 +128,7 @@ function createDispatcherTrigger() {
 }
 
 
-function createDispatcherFunction() {
+async function createDispatcherFunction() {
     client.query(createActionDispatcher, (err, res) => {
         if (err) {
             console.error(err);
@@ -139,7 +139,7 @@ function createDispatcherFunction() {
 }
 
 
-function makeActionsPublic() {
+async function makeActionsPublic() {
     client.query("INSERT INTO action VALUES ('authentication');", (err, res) => {
         if (err) {
             console.error(err);
@@ -150,7 +150,7 @@ function makeActionsPublic() {
 }
 
 
-function dropTriggerDispatcher() {
+async function dropTriggerDispatcher() {
     client.query("DROP TRIGGER dispatcher ON action_journal;", (err, res) => {
         if (err) {
             console.error(err);
@@ -161,7 +161,7 @@ function dropTriggerDispatcher() {
 }
 
 
-function dropActionJournal() {
+async function dropActionJournal() {
     client.query("DROP TABLE action_journal;", (err, res) => {
         if (err) {
             console.error(err);
@@ -172,7 +172,7 @@ function dropActionJournal() {
 }
 
 
-function createActionJournal() {
+async function createActionJournal() {
     client.query(createActionJournalTable, (err, res) => {
         if (err) {
             console.error(err);
@@ -183,18 +183,27 @@ function createActionJournal() {
 }
 
 
-async function actions() {
+async function dropActions() {
     await dropAuth();
     await dropTriggerDispatcher();
     await dropActionJournal();
     await dropActionTable();
+}
 
+
+async function createActions() {
     await createActionsTable();
     await createActionJournal();
     await createDispatcherFunction();
     await createDispatcherTrigger();
     await createAuthenticationFunction();
     await makeActionsPublic();
+}
+
+
+async function actions() {
+    dropActions();
+    createActions();
 }
 /* Actions end */
 
@@ -207,6 +216,7 @@ function recreateAccountTable() {
             createAccountTable();
             addAccount();
         }
+        client.end();
         read.close();
     });
 }
