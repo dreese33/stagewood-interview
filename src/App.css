@@ -28,6 +28,21 @@
   background-color: rgba(20, 92, 158, 0.25);
   padding: 40px;
   border-radius: 20px;
+  margin: 20px;
+  max-width: 50%;
+}
+
+.create-account {
+  text-align: left;
+  float: left;
+  font-size: 12px;
+  padding-bottom: 2px;
+  padding-left: 5px;
+}
+
+
+.account {
+  text-decoration: none;
 }
 
 
