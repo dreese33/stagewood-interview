@@ -29,7 +29,6 @@
   padding: 40px;
   border-radius: 20px;
   margin: 20px;
-  max-width: 50%;
 }
 
 .create-account {
@@ -56,6 +55,28 @@ input[type=text], select {
   box-sizing: border-box;
 }
 
+input[type=password], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 4px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+
+input[type=email], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 4px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+
 button[type=submit] {
   width: 100%;
   background-color: rgb(1, 22, 56);
@@ -67,6 +88,13 @@ button[type=submit] {
   cursor: pointer;
 }
 
+input[type=file], select {
+  display: inline-block;
+  text-align: left;
+  float: left;
+  color: rgba(20, 20, 20, 1);;
+}
+
 button[type=submit]:hover {
   background-color:  rgba(1, 30, 105, 1);
 }
@@ -76,6 +104,8 @@ label {
   color: rgba(20, 20, 20, 1);
   font-size: 20px;
   text-align: left;
+  float: left;
+  padding-left: 5px;;
 }
 
 h1 {
