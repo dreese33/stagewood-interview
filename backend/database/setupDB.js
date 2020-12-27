@@ -236,7 +236,7 @@ function testAccountTableExists() {
 async function callQueries() {
     //await actions();   //This function creates public functions on a table called actions for more security - needs more work
     await createPgcryptoExtension();
-    await testAccountTableExists();
+    testAccountTableExists();
 }
 
 
