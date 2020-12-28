@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { EmailExists, GetUser, UserExists, CreateUser } from '../GraphqlQueries.js';
+//import { GetUser } from '../GraphqlQueries.js';
 
 class LoginFormComponent extends Component {
 
@@ -21,7 +23,14 @@ class LoginFormComponent extends Component {
     }
 
     handleSubmit(event) {
-        console.log("Submitted");
+        //Testing code here
+        //console.log(JSON.stringify(GetUser({ "username": "dreese33" })));
+        GetUser("dreese33");
+        EmailExists("dylanjacobreese@gmail.com");
+        UserExists("dreese33");
+        CreateUser("name", "email@mail.com", "Dylan", "randompassword234231");
+        
+        //console.log("Submitted");
         event.preventDefault();
     }
 
