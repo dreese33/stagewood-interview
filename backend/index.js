@@ -38,13 +38,14 @@ const resolvers = {
     },
     Mutation: {
         createUser: async (parent, args, context, info) => {
-            const { username, email, name, password } = args; 
+            const { username, email, name, password, profile } = args;
             const newUser = context.prisma.accounts.create({
                 data: {
                     username: username,
                     email: email,
                     name: name,
-                    password: password
+                    password: password,
+                    profile: profile
                 }
             });
             return newUser;

@@ -14,7 +14,8 @@ const createAccountTableQuery = `
         username TEXT NOT NULL UNIQUE,
         email TEXT NOT NULL UNIQUE,
         name TEXT NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        profile TEXT NOT NULL
     );
 `;
 export { createAccountTableQuery };
@@ -23,11 +24,12 @@ export { createAccountTableQuery };
 //Hide password in environment variables
 //Password below means nothing
 const addAccountQuery = `
-    INSERT INTO accounts (username, email, name, password) VALUES(
+    INSERT INTO accounts (username, email, name, password, profile) VALUES(
         'dreese33',
         'dylanjacobreese@gmail.com',
         'Dylan Reese',
-        crypt('ThisIsAPassword43!', gen_salt('bf'))
+        crypt('ThisIsAPassword43!', gen_salt('bf')),
+        ''
     );
 `;
 export { addAccountQuery };

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { CreateUser } from '../GraphqlQueries';
+import axios from 'axios';
+import { storage } from '../firebase/index.js';
 
 class SignupFormComponent extends Component {
 
@@ -10,13 +12,15 @@ class SignupFormComponent extends Component {
             name: '',
             password: '',
             email: '',
-            confirm: ''
+            confirm: '',
+            file: null
         };
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handleConfirmChange = this.handleConfirmChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleSaveImage = this.handleSaveImage.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -50,9 +54,92 @@ class SignupFormComponent extends Component {
         });
     }
 
+    handleSaveImage(event) {
+        
+        if (event.target.files[0]) {
+            let image = event.target.files[0];
+
+            //Convert to png/rename
+            let blob = image.slice(0, image.size, 'image/png'); 
+            let newFile = new File([blob], 'profilePicture.png', {type: 'image/png'});
+            console.log(newFile.name);
+
+            this.setState({
+                file: newFile
+            });
+        }
+
+        //Save to firebase
+
+
+        //axios.post("/", image); 
+
+        //const url = URL.createObjectURL(image)
+        
+        /*
+        console.log(image.name);
+        const newFile = (window.URL ? URL : window.webkitURL).createObjectURL(image)
+        console.log(newFile);
+
+        this.setState({
+            file: newFile
+        });*/
+
+        /*
+        const reader = FileReader();
+        reader.addEventListener('load', (event) => {
+            img.src = event.target.result;
+        });
+        reader.readAsDataURL(file);
+        */
+        /*
+        if (fs.existsSync(dir)) {
+            // Do something
+            console.log("Working");
+        }*/
+        /*
+        fs.access(dir, function(error) {
+            if (error) {
+              console.log("Directory does not exist.")
+            } else {
+              console.log("Directory exists.")
+            }
+        })*/
+    }
+
     handleSubmit(event) {
         //TODO -- form validation here
-        CreateUser(this.state.username, this.state.email, this.state.name, this.state.password);
+        let formValidated = true;
+
+        //Upload to firebase
+        //TODO -- check if username is valid before running this code
+
+        if (formValidated) {
+            if (this.state.file != null) {
+                const imageName = this.state.username + this.state.file.name;
+                console.log(imageName);
+                console.log(this.state.username);
+                const uploadTask = storage.ref(`images/${imageName}`).put(this.state.file);
+                uploadTask.on(
+                    "state_changed",
+                    snapshot => {},
+                    error => {
+                        console.log(error);
+                    },
+                    () => {
+                        storage.ref('images').child(imageName).getDownloadURL().then(url => {
+                            console.log("Firebase image url is: " + url);
+                            CreateUser(this.state.username, this.state.email, this.state.name, this.state.password, url);
+                        });
+                    }
+                );
+            } else {
+                CreateUser(this.state.username, this.state.email, this.state.name, this.state.password, '');
+            }
+        } else {
+            console.log("Form not valid, displaying error to user...")
+        }
+
         event.preventDefault();
     }
 
@@ -71,7 +158,7 @@ class SignupFormComponent extends Component {
               <label htmlFor="confirm-pswd">Confirm Password:</label>
               <input type="password" id="confirm-pswd" name="confirm-pswd" onChange={this.handleConfirmChange}/><br/><br/>
               <label className="">Profile Picture: </label><br/>
-              <input id="image-file" type="file" accept="image/*"/><br/><br/>
+              <input id="image-file" type="file" accept="image/*" onChange={this.handleSaveImage}/><br/><br/>
               <span className="create-account">
                 <a href="/" title="Log In" id="log-in" className="account">
                   Log In Here

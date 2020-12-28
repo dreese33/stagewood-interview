@@ -13,4 +13,5 @@ model accounts {
   email    String @unique
   name     String
   password String
+  profile  String
 }

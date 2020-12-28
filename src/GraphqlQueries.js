@@ -40,8 +40,8 @@ const EMAIL_EXISTS = gql`
 
 
 const CREATE_USER = gql`
-    mutation createUser($username: String!, $email: String!, $name: String!, $password: String!) {
-        createUser(username: $username, email: $email, name: $name, password: $password) {
+    mutation createUser($username: String!, $email: String!, $name: String!, $password: String!, $profile: String!) {
+        createUser(username: $username, email: $email, name: $name, password: $password, profile: $profile) {
             id
         }
     }
@@ -114,7 +114,7 @@ function createIntPswd(encryptedPswd) {
 
 
 //Encrypt and store encryption key 
-export async function saveAndEncryptUser(usrname, mail, nme, pswd) {
+export async function saveAndEncryptUser(usrname, mail, nme, pswd, uri) {
 	//var data = await makeData();
 	//console.log("generated data", pswd);
 	var keys = await makeKeys()
@@ -124,11 +124,12 @@ export async function saveAndEncryptUser(usrname, mail, nme, pswd) {
         const encryptedPswd = bufToString(encrypted);
 
         console.log("Encrypted: " + encryptedPswd);
+        console.log("Uri" + uri);
         
         //This is where password needs to be stored in the database
         client.mutate({
             mutation: CREATE_USER,
-            variables: { username: usrname, email: mail, name: nme, password:  createIntPswd(encryptedPswd) },
+            variables: { username: usrname, email: mail, name: nme, password:  createIntPswd(encryptedPswd), profile: uri },
         })
         .then((response) => {
             console.log(response.data);
@@ -139,8 +140,8 @@ export async function saveAndEncryptUser(usrname, mail, nme, pswd) {
 }
 
 
-export function CreateUser(usrname, mail, nme, pswd) {
-    saveAndEncryptUser(usrname, mail, nme, pswd);
+export function CreateUser(usrname, mail, nme, pswd, uri) {
+    saveAndEncryptUser(usrname, mail, nme, pswd, uri);
 }
 
 
