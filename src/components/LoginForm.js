@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { handleLogin } from '../Login.js';
 import { encryptDataSaveKey, loadKeyDecryptData } from '../encrypt.js';
+import { CreateUser, Login } from '../GraphqlQueries.js';
 //import { GetUser } from '../GraphqlQueries.js';
 
 class LoginFormComponent extends Component {
@@ -18,25 +19,22 @@ class LoginFormComponent extends Component {
         this.setState({value: event.target.value});
     }
 
+
     handlePasswordChange(event) {
         console.log(event.target.value);
         this.setState({value: event.target.value});
     }
 
+
     handleSubmit(event) {
         //Testing code here
         //console.log(JSON.stringify(GetUser({ "username": "dreese33" })));
-        //GetUser("dreese33");
-        //EmailExists("dylanjacobreese@gmail.com");
-        //UserExists("dreese33");
-        //CreateUser("name", "email@mail.com", "Dylan", "randompassword234231");
 
-        //encryptDataSaveKey('anotherpass');
-        loadKeyDecryptData();
+        //CreateUser("username3", "mail3@mail.com", "rick", "IAmIntentionallyMakignThisLonger12923!!");
+        Login("username3", "IAmIntentionallyMakignThisLonger12923!!");
+        //localStorage.removeItem('token');
 
-        //handleLogin("dreese33", "notright");
-        
-        //console.log("Submitted");
+
         event.preventDefault();
     }
 

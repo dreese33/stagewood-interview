@@ -1,4 +1,6 @@
 import { ApolloClient, gql, InMemoryCache } from '@apollo/client';
+import { loadKeyDecryptData, encrypt, stringToBuf, bufToString, makeKeys, callOnStore } from './encrypt';
+import { encode } from 'utf8';
 
 const client = new ApolloClient({
     cache: new InMemoryCache(),
@@ -82,6 +84,7 @@ export function Login(usrname, password) {
         } else {
             console.log("User exists");
             //Need to decrypt password here to determine if user exists
+            loadKeyDecryptData(usrname, password, response.data.userExists.password);
         }
     })
     .catch((err) => console.error(err));
@@ -98,11 +101,43 @@ export function EmailExists(mail) {
 }
 
 
+function createIntPswd(encryptedPswd) {
+    let chars = [];
+    for (var i = 0; i < encryptedPswd.length; i++) {
+        const character = encryptedPswd.charCodeAt(i);
+        //console.log(character.toString());
+        //console.log(String.fromCharCode(character));
+        chars.push(character.toString());
+    }
+    return chars.join(" ");
+}
+
+
+//Encrypt and store encryption key 
+export async function saveAndEncryptUser(usrname, mail, nme, pswd) {
+	//var data = await makeData();
+	console.log("generated data", pswd);
+	var keys = await makeKeys()
+	var encrypted = await encrypt(stringToBuf(pswd), keys);
+	callOnStore(function (store) {
+        store.put({id: 1, keys: keys, encrypted: encrypted});
+        const encryptedPswd = bufToString(encrypted);
+
+        console.log("Encrypted: " + encryptedPswd);
+        console.log(createIntPswd(encryptedPswd));
+        
+        //This is where password needs to be stored in the database
+        client.mutate({
+            mutation: CREATE_USER,
+            variables: { username: usrname, email: mail, name: nme, password:  createIntPswd(encryptedPswd) },
+        })
+        .then((response) => console.log(response.data))
+        .catch((err) => console.error(err));
+	})
+}
+
+
+//TODO -- Not storing encrypted password in the database
 export function CreateUser(usrname, mail, nme, pswd) {
-    client.mutate({
-        mutation: CREATE_USER,
-        variables: { username: usrname, email: mail, name: nme, password: pswd },
-    })
-    .then((response) => console.log(response.data))
-    .catch((err) => console.error(err));
+    saveAndEncryptUser(usrname, mail, nme, pswd);
 }

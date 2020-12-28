@@ -1,20 +1,9 @@
 //Encryption/Decryption code taken from:
 //https://gist.github.com/saulshanabrook/b74984677bccd08b028b30d9968623f5
 
-//Encrypt and store encryption key 
-export async function encryptDataSaveKey(data) {
-	//var data = await makeData();
-	console.log("generated data", data);
-	var keys = await makeKeys()
-	var encrypted = await encrypt(stringToBuf(data), keys);
-	callOnStore(function (store) {
-		store.put({id: 1, keys: keys, encrypted: encrypted});
-	})
-}
-
 
 //Converts string to buffer
-function stringToBuf(str) {
+export function stringToBuf(str) {
     var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
     var bufView = new Uint16Array(buf);
     for (var i=0, strLen=str.length; i < strLen; i++) {
@@ -25,7 +14,7 @@ function stringToBuf(str) {
 
 
 //Converts buffer to string
-function bufToString(buf) {
+export function bufToString(buf) {
     return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
 
@@ -35,7 +24,7 @@ function bufToString(buf) {
 function cleanStr(str) {
     let accumulator = [];
     for (var i = 0; i < str.length; i++) {
-        if (str.charCodeAt(i) != 0) {
+        if (str.charCodeAt(i) !== 0) {
             accumulator.push(str.charAt(i));
         }
     }
@@ -43,23 +32,53 @@ function cleanStr(str) {
 }
 
 
-//Loads most recently stored password data
-export function loadKeyDecryptData() {
+function parseIntPswd(encryptedPswd) {
+	console.log("pass: " + encryptedPswd);
+    let charArr = encryptedPswd.split(" ");
+    let chars = [];
+    for (var i = 0; i < charArr.length; i++) {
+        const character = charArr[i];
+        //console.log(character.toString());
+        //console.log(String.fromCharCode(character));
+        chars.push(String.fromCharCode(character));
+	}
+	//console.log(chars);
+    return chars.join("");
+}
+
+
+//Loads most recently stored password data and authenticates user
+export function loadKeyDecryptData(username, password, dbPswd) {
 	callOnStore(function (store) {
-    var getData = store.get(1);
-    getData.onsuccess = async function() {
-    	var keys = getData.result.keys;
-      var encrypted = getData.result.encrypted;
-            var data = await decrypt(encrypted, keys);
-            let str = bufToString(data).toString().trim();
-            console.log(cleanStr(str));
-	   };
+		var getData = store.get(1);
+		var str = '';
+    	getData.onsuccess = async function() {
+			var keys = getData.result.keys;
+			
+			//console.log(parseIntPswd(dbPswd));
+
+			//var encrypted = getData.result.encrypted;
+			//console.log("Encrypted: " + bufToString(encrypted));
+			var encrypted = stringToBuf(parseIntPswd(dbPswd));
+        	var data = await decrypt(encrypted, keys);
+			str = bufToString(data).toString().trim();
+			
+			let cleanString = cleanStr(str);
+			console.log(cleanString);
+			if (password === cleanString) {
+				//TODO -- set token here, note: this can be set by anyone in the console!
+				localStorage.setItem('token', username);
+				console.log("Authentication succeeded");
+			} else {
+				console.log("Authentication failed, passwords do not match");
+			}
+		};
 	})
 }
 
 
 
-function callOnStore(fn_) {
+export function callOnStore(fn_) {
 
 	// This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
 	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
@@ -105,7 +124,7 @@ function makeData() {
 	return window.crypto.getRandomValues(new Uint8Array(16))
 }*/
 
-function makeKeys() {
+export function makeKeys() {
 	return window.crypto.subtle.generateKey(
     {
         name: "RSA-OAEP",
@@ -118,7 +137,7 @@ function makeKeys() {
    )
 }
 
-function encrypt(data, keys) {
+export function encrypt(data, keys) {
 	return window.crypto.subtle.encrypt(
     {
         name: "RSA-OAEP",
@@ -126,7 +145,7 @@ function encrypt(data, keys) {
     },
     keys.publicKey, //from generateKey or importKey above
     data //ArrayBuffer of data you want to encrypt
-)
+	)
 }
 
 

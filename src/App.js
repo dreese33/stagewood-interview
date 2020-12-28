@@ -6,7 +6,8 @@ import {
 } from 'react-router-dom';
 
 import SignupFormComponent from './components/SignupForm.js';
-import LoginFormComponent from './components/LoginForm.js'
+import LoginFormComponent from './components/LoginForm.js';
+import ProtectedRoute from './components/ProtectedRoute.js';
 
 
 export default function CustomLinkExample() {
@@ -20,6 +21,9 @@ export default function CustomLinkExample() {
           <Route path="/signup">
             <Signup />
           </Route>
+          <ProtectedRoute path="/home">
+            <Home />
+          </ProtectedRoute>
         </Switch>
       </div>
     </Router>
@@ -49,6 +53,16 @@ function Signup() {
           <h1>Sign Up:</h1>
           <SignupFormComponent/>
         </div>
+      </header>
+    </div>
+  );
+}
+
+function Home() {
+  return (
+    <div className="App">
+      <header className="App-header">
+          <h1>Home</h1>
       </header>
     </div>
   );
