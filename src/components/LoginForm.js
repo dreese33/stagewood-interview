@@ -8,21 +8,25 @@ class LoginFormComponent extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {value: ''};
+        this.state = {
+            username: '',
+            password: ''
+        };
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleUsernameChange(event) {
-        console.log(event.target.value);
-        this.setState({value: event.target.value});
+        this.setState({
+            username: event.target.value
+        });
     }
 
-
     handlePasswordChange(event) {
-        console.log(event.target.value);
-        this.setState({value: event.target.value});
+        this.setState({
+            password: event.target.value
+        });
     }
 
 
@@ -31,9 +35,10 @@ class LoginFormComponent extends Component {
         //console.log(JSON.stringify(GetUser({ "username": "dreese33" })));
 
         //CreateUser("username3", "mail3@mail.com", "rick", "IAmIntentionallyMakignThisLonger12923!!");
-        Login("username3", "IAmIntentionallyMakignThisLonger12923!!");
+        //Login("username3", "IAmIntentionallyMakignThisLonger12923!!");
         //localStorage.removeItem('token');
-
+        
+        Login(this.state.username, this.state.password);
 
         event.preventDefault();
     }

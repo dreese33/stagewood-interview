@@ -1,6 +1,7 @@
 //Encryption/Decryption code taken from:
 //https://gist.github.com/saulshanabrook/b74984677bccd08b028b30d9968623f5
 
+import { AuthenticateUser } from './GraphqlQueries.js';
 
 //Converts string to buffer
 export function stringToBuf(str) {
@@ -33,7 +34,7 @@ function cleanStr(str) {
 
 
 function parseIntPswd(encryptedPswd) {
-	console.log("pass: " + encryptedPswd);
+	//console.log("pass: " + encryptedPswd);
     let charArr = encryptedPswd.split(" ");
     let chars = [];
     for (var i = 0; i < charArr.length; i++) {
@@ -55,22 +56,24 @@ export function loadKeyDecryptData(username, password, dbPswd) {
     	getData.onsuccess = async function() {
 			var keys = getData.result.keys;
 			
-			//console.log(parseIntPswd(dbPswd));
-
-			//var encrypted = getData.result.encrypted;
-			//console.log("Encrypted: " + bufToString(encrypted));
 			var encrypted = stringToBuf(parseIntPswd(dbPswd));
-        	var data = await decrypt(encrypted, keys);
-			str = bufToString(data).toString().trim();
-			
-			let cleanString = cleanStr(str);
-			console.log(cleanString);
-			if (password === cleanString) {
-				//TODO -- set token here, note: this can be set by anyone in the console!
-				localStorage.setItem('token', username);
-				console.log("Authentication succeeded");
-			} else {
-				console.log("Authentication failed, passwords do not match");
+			console.log(encrypted);
+
+			try {
+				var data = await decrypt(encrypted, keys);
+				console.log(data);
+				str = bufToString(data).toString().trim();
+				
+				let cleanString = cleanStr(str);
+				console.log(cleanString);
+				if (password === cleanString) {
+					AuthenticateUser(username);
+					console.log("Authentication succeeded");
+				} else {
+					console.log("Authentication failed, passwords do not match");
+				}
+			} catch (error) {
+				console.log("Authentication failed");
 			}
 		};
 	})

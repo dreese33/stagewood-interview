@@ -116,7 +116,7 @@ function createIntPswd(encryptedPswd) {
 //Encrypt and store encryption key 
 export async function saveAndEncryptUser(usrname, mail, nme, pswd) {
 	//var data = await makeData();
-	console.log("generated data", pswd);
+	//console.log("generated data", pswd);
 	var keys = await makeKeys()
 	var encrypted = await encrypt(stringToBuf(pswd), keys);
 	callOnStore(function (store) {
@@ -124,20 +124,28 @@ export async function saveAndEncryptUser(usrname, mail, nme, pswd) {
         const encryptedPswd = bufToString(encrypted);
 
         console.log("Encrypted: " + encryptedPswd);
-        console.log(createIntPswd(encryptedPswd));
         
         //This is where password needs to be stored in the database
         client.mutate({
             mutation: CREATE_USER,
             variables: { username: usrname, email: mail, name: nme, password:  createIntPswd(encryptedPswd) },
         })
-        .then((response) => console.log(response.data))
+        .then((response) => {
+            console.log(response.data);
+            
+        })
         .catch((err) => console.error(err));
 	})
 }
 
 
-//TODO -- Not storing encrypted password in the database
 export function CreateUser(usrname, mail, nme, pswd) {
     saveAndEncryptUser(usrname, mail, nme, pswd);
+}
+
+
+export function AuthenticateUser(username) {
+    //TODO -- token can be set by anyone in the console!
+    //TODO -- redirect to home page
+    localStorage.setItem('token', username);
 }
