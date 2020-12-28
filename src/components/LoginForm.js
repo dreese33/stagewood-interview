@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { EmailExists, GetUser, UserExists, CreateUser } from '../GraphqlQueries.js';
+import { handleLogin } from '../Login.js';
+import { encryptDataSaveKey, loadKeyDecryptData } from '../encrypt.js';
 //import { GetUser } from '../GraphqlQueries.js';
 
 class LoginFormComponent extends Component {
@@ -25,10 +26,15 @@ class LoginFormComponent extends Component {
     handleSubmit(event) {
         //Testing code here
         //console.log(JSON.stringify(GetUser({ "username": "dreese33" })));
-        GetUser("dreese33");
-        EmailExists("dylanjacobreese@gmail.com");
-        UserExists("dreese33");
-        CreateUser("name", "email@mail.com", "Dylan", "randompassword234231");
+        //GetUser("dreese33");
+        //EmailExists("dylanjacobreese@gmail.com");
+        //UserExists("dreese33");
+        //CreateUser("name", "email@mail.com", "Dylan", "randompassword234231");
+
+        //encryptDataSaveKey('anotherpass');
+        loadKeyDecryptData();
+
+        //handleLogin("dreese33", "notright");
         
         //console.log("Submitted");
         event.preventDefault();

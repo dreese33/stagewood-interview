@@ -22,6 +22,7 @@ const USER_EXISTS = gql`
     query userExists($username: String!) {
         userExists(username: $username) {
             id
+            password
         }
     }
 `;
@@ -61,9 +62,31 @@ export function UserExists(usrname) {
         query: USER_EXISTS,
         variables: { username: usrname },
     })
-    .then((response) => console.log(response.data))
+    .then((response) => {
+        console.log(response.data);
+    })
     .catch((err) => console.error(err));
 }
+
+
+export function Login(usrname, password) {
+    client.query({
+        query: USER_EXISTS,
+        variables: { username: usrname },
+    })
+    .then((response) => {
+        console.log(response.data);
+        if (response.data.userExists === null) {
+            console.log("User does not exist");
+            //Login fails
+        } else {
+            console.log("User exists");
+            //Need to decrypt password here to determine if user exists
+        }
+    })
+    .catch((err) => console.error(err));
+}
+
 
 export function EmailExists(mail) {
     client.query({
@@ -73,6 +96,7 @@ export function EmailExists(mail) {
     .then((response) => console.log(response.data))
     .catch((err) => console.error(err));
 }
+
 
 export function CreateUser(usrname, mail, nme, pswd) {
     client.mutate({
