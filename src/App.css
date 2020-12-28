@@ -112,3 +112,17 @@ h1 {
   color: rgb(1, 22, 56);
   margin-bottom: 50px;
 }
+
+.circular {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  position: relative;
+  color: white;
+  background-color: white;
+  overflow: hidden;
+}
+
+.centered-input {
+  text-align: center;
+}

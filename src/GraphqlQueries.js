@@ -1,6 +1,13 @@
 import { ApolloClient, gql, InMemoryCache } from '@apollo/client';
-import { loadKeyDecryptData, encrypt, stringToBuf, bufToString, makeKeys, callOnStore } from './encrypt';
-import { encode } from 'utf8';
+import { encrypt, 
+    stringToBuf, 
+    bufToString, 
+    makeKeys, 
+    callOnStore,
+    parseIntPswd,
+    decrypt,
+    cleanStr } from './encrypt';
+
 
 const client = new ApolloClient({
     cache: new InMemoryCache(),
@@ -15,6 +22,7 @@ const GET_USER_INFORMATION = gql`
             email
             name
             password
+            profile
         }
     }
 `;
@@ -54,7 +62,11 @@ export function GetUser(usrname) {
             query: GET_USER_INFORMATION,
             variables: { username: usrname },
         })
-        .then((response) => console.log(response.data))
+        .then((response) => {
+            console.log(response.data);
+            const getUser = response.data.getUser;
+            AuthenticateUser(usrname, getUser.email, getUser.name, getUser.profile);
+        })
         .catch((err) => console.error(err));
 }
 
@@ -105,18 +117,52 @@ function createIntPswd(encryptedPswd) {
     let chars = [];
     for (var i = 0; i < encryptedPswd.length; i++) {
         const character = encryptedPswd.charCodeAt(i);
-        //console.log(character.toString());
-        //console.log(String.fromCharCode(character));
         chars.push(character.toString());
     }
     return chars.join(" ");
 }
 
 
-//Encrypt and store encryption key 
-export async function saveAndEncryptUser(usrname, mail, nme, pswd, uri) {
-	//var data = await makeData();
-	//console.log("generated data", pswd);
+async function checkPassword(encrypted, keys, str, username, password) {
+    try {
+        var data = await decrypt(encrypted, keys);
+        console.log(data);
+        str = bufToString(data).toString().trim();
+        
+        let cleanString = cleanStr(str);
+        console.log(cleanString);
+        if (password === cleanString) {
+            //Here we need to get user from database
+            GetUser(username);
+            console.log("Authentication succeeded");
+        } else {
+            console.log("Authentication failed, passwords do not match");
+        }
+    } catch (error) {
+        console.log("Authentication failed");
+    }
+}
+
+
+//Loads most recently stored password data and authenticates user
+export function loadKeyDecryptData(username, password, dbPswd) {
+	callOnStore(function (store) {
+		var getData = store.get(1);
+		var str = '';
+    	getData.onsuccess = async function() {
+			var keys = getData.result.keys;
+			
+			var encrypted = stringToBuf(parseIntPswd(dbPswd));
+			console.log(encrypted);
+
+			checkPassword(encrypted, keys, str, username, password);
+		};
+	})
+}
+
+
+//Encrypt and store encryption key and user data
+export async function CreateUser(usrname, mail, nme, pswd, uri) {
 	var keys = await makeKeys()
 	var encrypted = await encrypt(stringToBuf(pswd), keys);
 	callOnStore(function (store) {
@@ -133,20 +179,27 @@ export async function saveAndEncryptUser(usrname, mail, nme, pswd, uri) {
         })
         .then((response) => {
             console.log(response.data);
-            
+            AuthenticateUser(usrname, mail, nme, uri);
         })
         .catch((err) => console.error(err));
 	})
 }
 
 
-export function CreateUser(usrname, mail, nme, pswd, uri) {
-    saveAndEncryptUser(usrname, mail, nme, pswd, uri);
+export function AuthenticateUser(username, email, name, profile) {
+    //TODO -- token can be set by anyone in the console!
+    localStorage.setItem('token', username);
+    localStorage.setItem('email', email);
+    localStorage.setItem('name', name);
+    localStorage.setItem('profile', profile);
+
+    window.location.href = "./home";
 }
 
 
-export function AuthenticateUser(username) {
-    //TODO -- token can be set by anyone in the console!
-    //TODO -- redirect to home page
-    localStorage.setItem('token', username);
+export function clearLocalStorage() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('email');
+    localStorage.removeItem('name');
+    localStorage.removeItem('profile');
 }

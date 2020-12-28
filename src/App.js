@@ -8,6 +8,7 @@ import {
 import SignupFormComponent from './components/SignupForm.js';
 import LoginFormComponent from './components/LoginForm.js';
 import ProtectedRoute from './components/ProtectedRoute.js';
+import Home from './components/HomeComponent.js';
 
 
 export default function CustomLinkExample() {
@@ -53,16 +54,6 @@ function Signup() {
           <h1>Sign Up:</h1>
           <SignupFormComponent/>
         </div>
-      </header>
-    </div>
-  );
-}
-
-function Home() {
-  return (
-    <div className="App">
-      <header className="App-header">
-          <h1>Home</h1>
       </header>
     </div>
   );

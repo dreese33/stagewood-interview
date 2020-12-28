@@ -3,6 +3,7 @@
 
 import { AuthenticateUser } from './GraphqlQueries.js';
 
+
 //Converts string to buffer
 export function stringToBuf(str) {
     var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
@@ -21,8 +22,7 @@ export function bufToString(buf) {
 
 
 //Weird non-whitespace characters appearing
-//Cleans string
-function cleanStr(str) {
+export function cleanStr(str) {
     let accumulator = [];
     for (var i = 0; i < str.length; i++) {
         if (str.charCodeAt(i) !== 0) {
@@ -33,54 +33,22 @@ function cleanStr(str) {
 }
 
 
-function parseIntPswd(encryptedPswd) {
-	//console.log("pass: " + encryptedPswd);
+export function parseIntPswd(encryptedPswd) {
     let charArr = encryptedPswd.split(" ");
     let chars = [];
     for (var i = 0; i < charArr.length; i++) {
         const character = charArr[i];
-        //console.log(character.toString());
-        //console.log(String.fromCharCode(character));
         chars.push(String.fromCharCode(character));
 	}
-	//console.log(chars);
     return chars.join("");
 }
 
 
-//Loads most recently stored password data and authenticates user
-export function loadKeyDecryptData(username, password, dbPswd) {
-	callOnStore(function (store) {
-		var getData = store.get(1);
-		var str = '';
-    	getData.onsuccess = async function() {
-			var keys = getData.result.keys;
-			
-			var encrypted = stringToBuf(parseIntPswd(dbPswd));
-			console.log(encrypted);
-
-			try {
-				var data = await decrypt(encrypted, keys);
-				console.log(data);
-				str = bufToString(data).toString().trim();
-				
-				let cleanString = cleanStr(str);
-				console.log(cleanString);
-				if (password === cleanString) {
-					AuthenticateUser(username);
-					console.log("Authentication succeeded");
-				} else {
-					console.log("Authentication failed, passwords do not match");
-				}
-			} catch (error) {
-				console.log("Authentication failed");
-			}
-		};
-	})
-}
 
 
 
+
+//TODO -- use this instead of the localstorage token to ensure user authenticated
 export function callOnStore(fn_) {
 
 	// This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
@@ -113,7 +81,6 @@ export function callOnStore(fn_) {
 }
 
 async function encryptDecrypt(data) {
-	//var data = await makeData();
 	console.log("generated data", data);
 	var keys = await makeKeys()
 	var encrypted = await encrypt(data, keys);
@@ -121,11 +88,6 @@ async function encryptDecrypt(data) {
 	var finalData = await decrypt(encrypted, keys);
 	console.log("decrypted data", data);
 }
-
-/*
-function makeData() {
-	return window.crypto.getRandomValues(new Uint8Array(16))
-}*/
 
 export function makeKeys() {
 	return window.crypto.subtle.generateKey(
@@ -152,7 +114,7 @@ export function encrypt(data, keys) {
 }
 
 
-async function decrypt(data, keys) {
+export async function decrypt(data, keys) {
 	return new Uint8Array(await window.crypto.subtle.decrypt(
 	    {
 	        name: "RSA-OAEP",

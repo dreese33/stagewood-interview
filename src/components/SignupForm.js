@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { CreateUser } from '../GraphqlQueries';
 import axios from 'axios';
 import { storage } from '../firebase/index.js';
+import { Redirect } from 'react-router-dom'
 
 class SignupFormComponent extends Component {
 
@@ -68,43 +69,6 @@ class SignupFormComponent extends Component {
                 file: newFile
             });
         }
-
-        //Save to firebase
-
-
-        //axios.post("/", image); 
-
-        //const url = URL.createObjectURL(image)
-        
-        /*
-        console.log(image.name);
-        const newFile = (window.URL ? URL : window.webkitURL).createObjectURL(image)
-        console.log(newFile);
-
-        this.setState({
-            file: newFile
-        });*/
-
-        /*
-        const reader = FileReader();
-        reader.addEventListener('load', (event) => {
-            img.src = event.target.result;
-        });
-        reader.readAsDataURL(file);
-        */
-        /*
-        if (fs.existsSync(dir)) {
-            // Do something
-            console.log("Working");
-        }*/
-        /*
-        fs.access(dir, function(error) {
-            if (error) {
-              console.log("Directory does not exist.")
-            } else {
-              console.log("Directory exists.")
-            }
-        })*/
     }
 
     handleSubmit(event) {
