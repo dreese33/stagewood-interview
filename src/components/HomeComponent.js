@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
+import { clearLocalStorage } from '../GraphqlQueries.js';
 
 class Home extends React.Component {
 
     constructor(props) {
-        //this.handleUsernameChange = this.handleUsernameChange.bind(this);
         super(props);
 
         this.state = {
@@ -12,18 +12,23 @@ class Home extends React.Component {
             name: localStorage.getItem('name'),
             profileUrl: localStorage.getItem('profile')
         }
+        this.handleLogout = this.handleLogout.bind(this);
+    }
+
+    handleLogout(event) {
+        clearLocalStorage();
+        window.location.href = "./";
     }
     
-    //<img src={/*get image*/} alt="Girl in a jacket" width="500" height="600"/>
     render() {
-        //console.log("Rendered");
         return (
             <div className="App">
               <header className="App-header">
                 <div className="auth-container modulate-auth-width">
+                    <button className="logout" onClick={this.handleLogout}>Log Out</button><br/><br/>
                     <img src={this.state.profileUrl} alt='' className="circular"/><br/><br/>
+                    <h1>{"Hello " + this.state.username + "!"}</h1>
                     <form>
-                        <input className="centered-input" type="text" id="username" value={this.state.username} disabled />
                         <input className="centered-input" type="text" id="email" value={this.state.email} disabled />
                         <input className="centered-input" type="text" id="name" value={this.state.name} disabled />
                     </form>

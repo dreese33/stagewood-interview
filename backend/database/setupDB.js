@@ -16,7 +16,7 @@ import { createActionTable, createActionDispatcher, createDispatcher, createActi
 
 
 const deleteDBStr = 'The table `accounts` already exists, meaning this database is already setup.';
-const warning = 'Warning: This operation will result in all database entries being deleted. To recreate the tables, enter `drop-tables`';
+const warning = 'Warning: This operation will result in all database entries being deleted. To recreate the tables, enter `drop-tables`\n';
 
 
 //Connect to DB
@@ -216,7 +216,6 @@ function recreateAccountTable() {
             createAccountTable();
             addAccount();
         }
-        client.end();
         read.close();
     });
 }

@@ -125,7 +125,8 @@ async function checkPassword(encrypted, keys, str, username, password) {
 //Loads most recently stored password data and authenticates user
 export function loadKeyDecryptData(username, password, dbPswd) {
 	callOnStore(function (store) {
-		var getData = store.get(1);
+        //Gets first index from store
+		var getData = store.get(username);
 		var str = '';
     	getData.onsuccess = async function() {
 			var keys = getData.result.keys;
@@ -144,7 +145,7 @@ export async function CreateUser(usrname, mail, nme, pswd, uri) {
 	var keys = await makeKeys()
 	var encrypted = await encrypt(stringToBuf(pswd), keys);
 	callOnStore(function (store) {
-        store.put({id: 1, keys: keys, encrypted: encrypted});
+        store.put({username: usrname, keys: keys, encrypted: encrypted});
         const encryptedPswd = bufToString(encrypted);
 
         console.log("Encrypted: " + encryptedPswd);
@@ -165,7 +166,7 @@ export async function CreateUser(usrname, mail, nme, pswd, uri) {
 
 
 export function AuthenticateUser(username, email, name, profile) {
-    //TODO -- token can be set by anyone in the console!
+    //TODO -- token can be set by anyone in the console! Needs fixed
     localStorage.setItem('token', username);
     localStorage.setItem('email', email);
     localStorage.setItem('name', name);

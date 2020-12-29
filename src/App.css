@@ -126,3 +126,9 @@ h1 {
 .centered-input {
   text-align: center;
 }
+
+.logout {
+  display: inline-block;
+  float: right;
+  border-radius: 5px;
+}

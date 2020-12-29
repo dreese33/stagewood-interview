@@ -44,10 +44,6 @@ export function parseIntPswd(encryptedPswd) {
 }
 
 
-
-
-
-
 //TODO -- use this instead of the localstorage token to ensure user authenticated
 export function callOnStore(fn_) {
 
@@ -56,11 +52,13 @@ export function callOnStore(fn_) {
 
 	// Open (or create) the database
 	var open = indexedDB.open("MyDatabase", 1);
+	//indexedDB.deleteDatabase("MyDatabase");
 
 	// Create the schema
+	
 	open.onupgradeneeded = function() {
 	    var db = open.result;
-	    var store = db.createObjectStore("MyObjectStore", {keyPath: "id"});
+	    var store = db.createObjectStore("MyObjectStore", {keyPath: "username", autoIncrement: true});
 	};
 
 
@@ -80,6 +78,7 @@ export function callOnStore(fn_) {
 	}
 }
 
+
 async function encryptDecrypt(data) {
 	console.log("generated data", data);
 	var keys = await makeKeys()
@@ -88,6 +87,7 @@ async function encryptDecrypt(data) {
 	var finalData = await decrypt(encrypted, keys);
 	console.log("decrypted data", data);
 }
+
 
 export function makeKeys() {
 	return window.crypto.subtle.generateKey(
@@ -101,6 +101,7 @@ export function makeKeys() {
     ["encrypt", "decrypt"] //must be ["encrypt", "decrypt"] or ["wrapKey", "unwrapKey"]
    )
 }
+
 
 export function encrypt(data, keys) {
 	return window.crypto.subtle.encrypt(

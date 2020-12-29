@@ -139,6 +139,7 @@ class SignupFormComponent extends Component {
                         }
                     );
                 } else {
+                    console.log("this");
                     CreateUser(username, email, name, password, '');
                 }
             } else {
