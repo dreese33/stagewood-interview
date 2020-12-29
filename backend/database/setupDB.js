@@ -21,7 +21,7 @@ const warning = 'Warning: This operation will result in all database entries bei
 
 //Connect to DB
 const client = new Client({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE,
     ssl: { rejectUnauthorized: false }
 });
 
