@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { CreateUser } from '../GraphqlQueries';
+import { CreateUser, EMAIL_EXISTS, USER_EXISTS, client } from '../GraphqlQueries';
 import axios from 'axios';
 import { storage } from '../firebase/index.js';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
+import { checkEmptyFields,
+            validateEmail } from '../FormValidation.js';
 
 class SignupFormComponent extends Component {
 
@@ -73,36 +75,105 @@ class SignupFormComponent extends Component {
 
     handleSubmit(event) {
         //TODO -- form validation here
+
+        const email = this.state.email;
+        const username = this.state.username;
+        const name = this.state.name;
+        const password = this.state.password;
+        const confirm = this.state.confirm;
+        const file = this.state.file;
+
+        let message = '';
         let formValidated = true;
-
-        //Upload to firebase
-        //TODO -- check if username is valid before running this code
-
-        if (formValidated) {
-            if (this.state.file != null) {
-                const imageName = this.state.username + this.state.file.name;
-                console.log(imageName);
-                console.log(this.state.username);
-                const uploadTask = storage.ref(`images/${imageName}`).put(this.state.file);
-                uploadTask.on(
-                    "state_changed",
-                    snapshot => {},
-                    error => {
-                        console.log(error);
-                    },
-                    () => {
-                        storage.ref('images').child(imageName).getDownloadURL().then(url => {
-                            console.log("Firebase image url is: " + url);
-                            CreateUser(this.state.username, this.state.email, this.state.name, this.state.password, url);
-                        });
-                    }
-                );
-            } else {
-                CreateUser(this.state.username, this.state.email, this.state.name, this.state.password, '');
-            }
-        } else {
-            console.log("Form not valid, displaying error to user...")
+        
+        if (!validateEmail(email)) {
+            message = 'Email is invalid';
+            formValidated = false;
         }
+
+        if (password !== confirm) {
+            message = 'Passwords do not match'
+            formValidated = false;
+        }
+
+        //Check if email and or username exists
+
+
+        if (checkEmptyFields([username,
+            email,
+            name,
+            password,
+            confirm])) {
+
+            message = 'All fields must have a value';
+            formValidated = false;
+        }
+
+        //Creates user if form is validated
+        function validateAndCreate() {
+            if (formValidated) {
+                if (file != null) {
+                    const imageName = username + file.name;
+                    console.log(imageName);
+                    console.log(username);
+                    const uploadTask = storage.ref(`images/${imageName}`).put(file);
+                    uploadTask.on(
+                        "state_changed",
+                        snapshot => {},
+                        error => {
+                            console.log(error);
+                        },
+                        () => {
+                            storage.ref('images').child(imageName).getDownloadURL().then(url => {
+                                console.log("Firebase image url is: " + url);
+                                CreateUser(username, 
+                                    email, 
+                                    name, 
+                                    password, 
+                                    url);
+                            });
+                        }
+                    );
+                } else {
+                    CreateUser(username, email, name, password, '');
+                }
+            } else {
+                alert(message);
+            }
+        }
+
+
+        function emailExists() {
+            client.query({
+                query: EMAIL_EXISTS,
+                variables: { email: email },
+            })
+            .then((response) => {
+                console.log(response.data);
+                if (response.data.emailExists === null) {
+                    validateAndCreate();
+                } else {
+                    alert("Email already exists");
+                }
+            })
+            .catch((err) => console.error(err));
+        }
+
+
+        //Check if username exists
+        client.query({
+            query: USER_EXISTS,
+            variables: { username: username },
+        })
+        .then((response) => {
+            console.log(response.data);
+            if (response.data.userExists === null) {
+                emailExists();
+            } else {
+                alert("Username already exists")
+            }
+        })
+        .catch((err) => console.error(err));
 
         event.preventDefault();
     }

@@ -9,7 +9,7 @@ import { encrypt,
     cleanStr } from './encrypt';
 
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
     cache: new InMemoryCache(),
     uri: 'http://localhost:4000/graphql'
 });
@@ -28,7 +28,7 @@ const GET_USER_INFORMATION = gql`
 `;
 
 
-const USER_EXISTS = gql`
+export const USER_EXISTS = gql`
     query userExists($username: String!) {
         userExists(username: $username) {
             id
@@ -38,7 +38,7 @@ const USER_EXISTS = gql`
 `;
 
 
-const EMAIL_EXISTS = gql`
+export const EMAIL_EXISTS = gql`
     query emailExists($email: String!) {
         emailExists(email: $email) {
             id
@@ -68,9 +68,10 @@ export function GetUser(usrname) {
             AuthenticateUser(usrname, getUser.email, getUser.name, getUser.profile);
         })
         .catch((err) => console.error(err));
-}
+} 
 
 
+/*
 export function UserExists(usrname) {
     client.query({
         query: USER_EXISTS,
@@ -80,7 +81,7 @@ export function UserExists(usrname) {
         console.log(response.data);
     })
     .catch((err) => console.error(err));
-}
+}*/
 
 
 export function Login(usrname, password) {
@@ -102,7 +103,7 @@ export function Login(usrname, password) {
     .catch((err) => console.error(err));
 }
 
-
+/*
 export function EmailExists(mail) {
     client.query({
         query: EMAIL_EXISTS,
@@ -110,7 +111,7 @@ export function EmailExists(mail) {
     })
     .then((response) => console.log(response.data))
     .catch((err) => console.error(err));
-}
+}*/
 
 
 function createIntPswd(encryptedPswd) {
