@@ -16,7 +16,7 @@ import { createActionTable, createActionDispatcher, createDispatcher, createActi
 
 
 const deleteDBStr = 'The table `accounts` already exists, meaning this database is already setup.';
-const warning = 'Warning: This operation will result in all database entries being deleted. To recreate the tables, enter `drop-database`';
+const warning = 'Warning: This operation will result in all database entries being deleted. To recreate the tables, enter `drop-tables`';
 
 
 //Connect to DB
@@ -210,7 +210,7 @@ async function actions() {
 
 function recreateAccountTable() {
     read.question(deleteDBStr + '\n' + warning, response => {
-        if (response === "drop-database") {
+        if (response === "drop-tables") {
             console.log("\nClearing database");
             clearDatabase();
             createAccountTable();

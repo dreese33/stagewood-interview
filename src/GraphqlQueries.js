@@ -68,20 +68,7 @@ export function GetUser(usrname) {
             AuthenticateUser(usrname, getUser.email, getUser.name, getUser.profile);
         })
         .catch((err) => console.error(err));
-} 
-
-
-/*
-export function UserExists(usrname) {
-    client.query({
-        query: USER_EXISTS,
-        variables: { username: usrname },
-    })
-    .then((response) => {
-        console.log(response.data);
-    })
-    .catch((err) => console.error(err));
-}*/
+}
 
 
 export function Login(usrname, password) {
@@ -102,16 +89,6 @@ export function Login(usrname, password) {
     })
     .catch((err) => console.error(err));
 }
-
-/*
-export function EmailExists(mail) {
-    client.query({
-        query: EMAIL_EXISTS,
-        variables: { email: mail },
-    })
-    .then((response) => console.log(response.data))
-    .catch((err) => console.error(err));
-}*/
 
 
 function createIntPswd(encryptedPswd) {

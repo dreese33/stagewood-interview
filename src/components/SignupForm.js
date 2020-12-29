@@ -4,7 +4,8 @@ import axios from 'axios';
 import { storage } from '../firebase/index.js';
 import { Redirect } from 'react-router-dom';
 import { checkEmptyFields,
-            validateEmail } from '../FormValidation.js';
+            validateEmail,
+            passwordValid } from '../FormValidation.js';
 
 class SignupFormComponent extends Component {
 
@@ -97,7 +98,10 @@ class SignupFormComponent extends Component {
         }
 
         //Check if email and or username exists
-
+        if (!passwordValid(password)) {
+            message = "Password invalid: must contain one number, one special character, and be between 6 and 16 characters in length";
+            formValidated = false;
+        }
 
         if (checkEmptyFields([username,
             email,

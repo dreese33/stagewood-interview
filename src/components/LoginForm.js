@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Login } from '../GraphqlQueries.js';
+import { checkEmptyFields } from '../FormValidation.js';
 
 class LoginFormComponent extends Component {
 
@@ -28,8 +29,23 @@ class LoginFormComponent extends Component {
 
 
     handleSubmit(event) {
+
+        const username = this.state.username;
+        const password = this.state.password;
+
+        let formValidated = true;
+        let message = '';
+
+        if (checkEmptyFields([username, password])) {
+            message = 'All fields must have a value';
+            formValidated = false;
+        }
         
-        Login(this.state.username, this.state.password);
+        if (formValidated) {
+            Login(username, password);
+        } else {
+            alert(message);
+        }
 
         event.preventDefault();
     }

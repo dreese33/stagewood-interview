@@ -17,3 +17,9 @@ export function validateEmail(email) {
     }
     return false;
 }
+
+
+export function passwordValid(password) {
+    let regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/
+    return password.match(regex);
+}
