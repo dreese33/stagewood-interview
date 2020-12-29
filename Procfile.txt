@@ -1,1 +1,2 @@
 web: yarn start
+api: node backend/index.js
