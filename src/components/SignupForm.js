@@ -66,7 +66,6 @@ class SignupFormComponent extends Component {
             //Convert to png/rename
             let blob = image.slice(0, image.size, 'image/png'); 
             let newFile = new File([blob], 'profilePicture.png', {type: 'image/png'});
-            console.log(newFile.name);
 
             this.setState({
                 file: newFile
@@ -118,8 +117,6 @@ class SignupFormComponent extends Component {
             if (formValidated) {
                 if (file != null) {
                     const imageName = username + file.name;
-                    console.log(imageName);
-                    console.log(username);
                     const uploadTask = storage.ref(`images/${imageName}`).put(file);
                     uploadTask.on(
                         "state_changed",
@@ -139,7 +136,6 @@ class SignupFormComponent extends Component {
                         }
                     );
                 } else {
-                    console.log("this");
                     CreateUser(username, email, name, password, '');
                 }
             } else {
@@ -154,7 +150,6 @@ class SignupFormComponent extends Component {
                 variables: { email: email },
             })
             .then((response) => {
-                console.log(response.data);
                 if (response.data.emailExists === null) {
                     validateAndCreate();
                 } else {
@@ -171,7 +166,6 @@ class SignupFormComponent extends Component {
             variables: { username: username },
         })
         .then((response) => {
-            console.log(response.data);
             if (response.data.userExists === null) {
                 emailExists();
             } else {

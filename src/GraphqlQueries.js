@@ -11,9 +11,9 @@ import { encrypt,
 
 export const client = new ApolloClient({
     cache: new InMemoryCache(),
-    uri: 'https://stagewood-apiserver.herokuapp.com/'
+    uri: 'http://localhost:4000/graphql'//'https://stagewood-apiserver.herokuapp.com/'
 });
-//'http://localhost:4000/graphql'
+//
 
 const GET_USER_INFORMATION = gql`
     query getUser($username: String!) {
@@ -64,7 +64,6 @@ export function GetUser(usrname) {
             variables: { username: usrname },
         })
         .then((response) => {
-            console.log(response.data);
             const getUser = response.data.getUser;
             AuthenticateUser(usrname, getUser.email, getUser.name, getUser.profile);
         })
@@ -78,12 +77,9 @@ export function Login(usrname, password) {
         variables: { username: usrname },
     })
     .then((response) => {
-        console.log(response.data);
         if (response.data.userExists === null) {
-            console.log("User does not exist");
-            //Login fails
+            alert("Invalid credentials")
         } else {
-            console.log("User exists");
             //Need to decrypt password here to determine if user exists
             loadKeyDecryptData(usrname, password, response.data.userExists.password);
         }
@@ -105,20 +101,18 @@ function createIntPswd(encryptedPswd) {
 async function checkPassword(encrypted, keys, str, username, password) {
     try {
         var data = await decrypt(encrypted, keys);
-        console.log(data);
         str = bufToString(data).toString().trim();
         
         let cleanString = cleanStr(str);
-        console.log(cleanString);
         if (password === cleanString) {
             //Here we need to get user from database
             GetUser(username);
             console.log("Authentication succeeded");
         } else {
-            console.log("Authentication failed, passwords do not match");
+            alert("Invalid credentials");
         }
     } catch (error) {
-        console.log("Authentication failed");
+        alert("Invalid credentials");
     }
 }
 
@@ -130,12 +124,15 @@ export function loadKeyDecryptData(username, password, dbPswd) {
 		var getData = store.get(username);
 		var str = '';
     	getData.onsuccess = async function() {
-			var keys = getData.result.keys;
-			
-			var encrypted = stringToBuf(parseIntPswd(dbPswd));
-			console.log(encrypted);
+            if (typeof getData.result !== 'undefined') {
+                var keys = getData.result.keys;
+                
+                var encrypted = stringToBuf(parseIntPswd(dbPswd));
 
-			checkPassword(encrypted, keys, str, username, password);
+                checkPassword(encrypted, keys, str, username, password);
+            } else {
+                alert("Invalid credentials")
+            }
 		};
 	})
 }
@@ -148,9 +145,6 @@ export async function CreateUser(usrname, mail, nme, pswd, uri) {
 	callOnStore(function (store) {
         store.put({username: usrname, keys: keys, encrypted: encrypted});
         const encryptedPswd = bufToString(encrypted);
-
-        console.log("Encrypted: " + encryptedPswd);
-        console.log("Uri" + uri);
         
         //This is where password needs to be stored in the database
         client.mutate({
@@ -158,7 +152,6 @@ export async function CreateUser(usrname, mail, nme, pswd, uri) {
             variables: { username: usrname, email: mail, name: nme, password:  createIntPswd(encryptedPswd), profile: uri },
         })
         .then((response) => {
-            console.log(response.data);
             AuthenticateUser(usrname, mail, nme, uri);
         })
         .catch((err) => console.error(err));

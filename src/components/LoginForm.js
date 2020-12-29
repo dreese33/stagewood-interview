@@ -40,6 +40,15 @@ class LoginFormComponent extends Component {
             message = 'All fields must have a value';
             formValidated = false;
         }
+
+        // Open (or create) the database
+        var open = indexedDB.open("MyDatabase", 1);
+
+        // Create the schema
+        open.onupgradeneeded = function() {
+            var db = open.result;
+            var store = db.createObjectStore("MyObjectStore", {keyPath: "username", autoIncrement: true});
+        };
         
         if (formValidated) {
             Login(username, password);
