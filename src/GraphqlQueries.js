@@ -11,8 +11,9 @@ import { encrypt,
 
 export const client = new ApolloClient({
     cache: new InMemoryCache(),
-    uri: 'http://localhost:4000/graphql'
+    uri: 'https://stagewood-apiserver.herokuapp.com/'
 });
+//'http://localhost:4000/graphql'
 
 const GET_USER_INFORMATION = gql`
     query getUser($username: String!) {
