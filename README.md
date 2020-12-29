@@ -38,4 +38,4 @@ Runs GraphQL server on [http://localhost:4000](http://localhost:4000)
 ### `node backend/database/setupDB.js`
 
 This creates the database tables automatically if they do not exist.\
-To recreate the tables run this script followed by: `drop tables`
+To delete the tables run this script followed by: `drop-tables`
